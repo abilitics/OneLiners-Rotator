@@ -1,0 +1,152 @@
+<html>
+<head>
+
+    <style type="text/css">
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+		
+		/* Pulse Grow */
+		@-webkit-keyframes hvr-pulse-grow {
+		  to {
+			-webkit-transform: scale(1.2);
+			transform: scale(1.2);
+		  }
+		}
+
+		@keyframes hvr-pulse-grow {
+		  to {
+			-webkit-transform: scale(1.2);
+			transform: scale(1.2);
+		  }
+		}
+
+		.hvr-pulse-grow {
+		  display: inline-block;
+		  vertical-align: middle;
+		  -webkit-transform: translateZ(0);
+		  transform: translateZ(0);
+		  box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+		  -webkit-backface-visibility: hidden;
+		  backface-visibility: hidden;
+		  -moz-osx-font-smoothing: grayscale;
+		}
+		.hvr-pulse-grow:hover, .hvr-pulse-grow:focus, .hvr-pulse-grow:active, .hvr-pulse-grow.activate {
+		  -webkit-animation-name: hvr-pulse-grow;
+		  animation-name: hvr-pulse-grow;
+		  -webkit-animation-duration: 0.5s;
+		  animation-duration: 0.5s;
+		  -webkit-animation-timing-function: linear;
+		  animation-timing-function: linear;
+		  -webkit-animation-iteration-count: infinite;
+		  animation-iteration-count: infinite;
+		  -webkit-animation-direction: alternate;
+		  animation-direction: alternate;
+		}
+		
+    </style>
+	
+    <script src="jquery-2.1.3.min.js"></script>
+
+</head>
+
+<body style="background-color:#efefef">
+
+    <div>
+        <img src="logo.png" style="display:block;margin-left:auto;margin-right:auto;margin-top:50px" />
+    </div>
+
+	<div style="margin:30px 300px;">
+		<div style="font-size:36px;color:#ff0000;font-weight:bold">Killer Single-page apps with Office 365 APIs and Angular</div>
+		<br/>
+		<div style="font-size:28px;color:#903e00;font-weight:bold">
+			Jivko Petiov
+			<br />
+			Chief Architect, Abilitics
+		</div>
+	</div>
+    
+
+    <div style="margin: 60px 300px;font-size:28px;color:#903e00;font-weight:bold" class="hvr-pulse-grow">
+		Session starts in <span id="remaining"></span>
+	</div>
+	
+	<div style="margin: 0px 300px;font-size:20px;color:#ff0000;font-weight:bold">Quote of the day:</div>
+    <div class="lines" style="margin: 10px 300px 60px 300px;font-size:28px;color:#903e00;font-weight:bold"></div>
+
+	</div>
+	
+    <script>
+        
+        var sessionDate = new Date(2016, 27, 3, 11, 45, 00);
+        var animationInterval = 14; // seconds
+		
+		var counter = 0;
+		
+        $.get("oneliners.txt", function (data) {
+            var lines = data.split("\r\n\r\n");
+            lines = lines.filter(function (line) { return !!line; });
+			shuffle(lines);
+			
+            setNextLine();
+            setInterval(setNextLine, animationInterval * 1000);
+
+            function setNextLine() {
+                var line = lines[counter];
+                line = line.trim().replace("\r\n", "<br/>").replace("\n", "<br/>");
+                $(".lines").fadeOut(function () {
+                    $(".lines").html(line).fadeIn();
+                });
+                counter++;
+            }
+
+        });
+
+        updateTime();
+        var intervalId = setInterval(updateTime, 1000);
+
+        function updateTime() {
+            
+            var offset = new Date(sessionDate - new Date());
+            var minutes = offset.getMinutes();
+            var result = "";
+            if (minutes > 0)
+                result += minutes + " minutes ";
+			
+			var seconds = offset.getSeconds();
+			
+            result += seconds + " seconds";
+
+            $("#remaining").text(result);
+			
+			if (!$(".hvr-pulse-grow").hasClass("activate") && minutes === 0 && seconds < 15) {
+				$(".hvr-pulse-grow").addClass("activate");
+			}
+			
+			if (minutes === 0 && seconds <= 1)
+				clearInterval(intervalId);
+        }
+		
+		function shuffle(array) {
+		  var currentIndex = array.length, temporaryValue, randomIndex;
+
+		  // While there remain elements to shuffle...
+		  while (0 !== currentIndex) {
+
+			// Pick a remaining element...
+			randomIndex = Math.floor(Math.random() * currentIndex);
+			currentIndex -= 1;
+
+			// And swap it with the current element.
+			temporaryValue = array[currentIndex];
+			array[currentIndex] = array[randomIndex];
+			array[randomIndex] = temporaryValue;
+		  }
+
+		  return array;
+		}
+
+    </script>
+
+</body>
+</html>
